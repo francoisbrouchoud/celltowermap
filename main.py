@@ -123,22 +123,26 @@ map.add_child(salt_cluster)
 folium.LayerControl().add_to(map)
 
 
-footer_html = """
-<div style="position: fixed; bottom: 0; left: 0; width: 100%; text-align: center; font-size: 12px; background-color: rgba(255, 255, 255, 0.6); z-index: 9999;">
-    <span>Source des données: <a href="https://www.geocat.ch/geonetwork/srv/fre/catalog.search#/metadata/6a972f46-ae47-4db9-b5a7-dcfd3598bd95">OFCOM</a> </span>
-    <br>
-    <span>Repo: <a href="https://github.com/francoisbrouchoud/celltowermap">https://github.com/francoisbrouchoud/celltowermap</a></span>
-</div>
-"""
+# Adding footer
+footer_content = ('Repo open source : '
+                  '<a href="https://github.com/francoisbrouchoud/celltowermap" target="_blank">github.com/francoisbrouchoud/celltowermap</a> '
+                  'sous licence MIT <br> Source des données : <a href="https://www.geocat.ch/geonetwork/srv/fre/catalog.search#/metadata/6a972f46-ae47-4db9-b5a7-dcfd3598bd95" target="_blank">OFCOM</a> '
+                  'récupéré le 16.03.2024 | ')
 
-script = Element(f"""
-    <script type="text/javascript">
-    var footer = `{footer_html}`;
-    $(document).ready(function() {{
-        $(".leaflet-control-attribution").append(footer);
+script = Element("""
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {{
+      var attributionDiv = document.querySelector('.leaflet-control-attribution');
+      if (attributionDiv) {{
+        var firstLink = attributionDiv.querySelector('a');
+        var newContent = document.createElement('span');
+        newContent.innerHTML = `{new_content}`;
+        attributionDiv.insertBefore(newContent, firstLink);
+      }}
     }});
-    </script>
-""")
+</script>
+""".format(new_content=footer_content))
+
 
 map.get_root().html.add_child(script)
 
