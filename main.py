@@ -62,7 +62,6 @@ tolerance = 0.001
 
 # Map initialisation
 map = folium.Map(location=[46.8182, 8.2275])
-marker_cluster = MarkerCluster().add_to(map)
 
 swisscom_cluster = MarkerCluster(name='Swisscom')
 sunrise_cluster = MarkerCluster(name='Sunrise')
