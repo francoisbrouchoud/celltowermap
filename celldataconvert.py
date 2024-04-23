@@ -19,7 +19,7 @@ def LV95toWGS(easting, northing):
 
 
 # Load OFCOM cell dataset JSON
-with open('data/standorte-mobilfunkanlagen_2056.json', 'r') as f:
+with open('data/archive/20240223_standorte-mobilfunkanlagen_2056.json', 'r') as f:
     data = json.load(f)
 
 new_data = {
@@ -31,15 +31,15 @@ for feature in data['features']:
     lat, lon = LV95toWGS(*feature['geometry']['coordinates'])
     operator = feature['properties']['station'].split(" ")[0]
     technology = feature['properties']['techno_fr']
-    power = feature['properties']['power_fr'].lower()
+    powerinput = feature['properties']['power_en'].lower()
 
-    if 'très faible' in power:
+    if 'very low' in powerinput:
         power = 'très faible'
-    elif 'faible' in power:
+    elif 'low' in powerinput:
         power = 'faible'
-    elif 'moyenne' in power:
+    elif 'medium' in powerinput:
         power = 'moyenne'
-    elif 'forte' in power:
+    elif 'strong' in powerinput:
         power = 'forte'
 
     celltower = {
