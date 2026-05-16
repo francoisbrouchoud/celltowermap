@@ -8,7 +8,7 @@ import { CellTowerDataset } from '../models/cell-tower.model';
 })
 export class CellTowerService {
   private readonly http = inject(HttpClient);
-  private readonly dataUrl = '/data/celltowerdataset.json';
+  private readonly dataUrl = '/data/swiss-cell-tower-sites.json';
 
   getCellTowers(): Observable<CellTowerDataset> {
     return this.http.get<CellTowerDataset>(this.dataUrl);

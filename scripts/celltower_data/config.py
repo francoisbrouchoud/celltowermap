@@ -13,8 +13,8 @@ SOURCE_METADATA_URL = (
 )
 
 RAW_DATA_FILE = BASE_DIR / "data" / "raw" / "standorte-mobilfunkanlagen_2056.json"
-PROCESSED_DATA_FILE = BASE_DIR / "data" / "processed" / "celltowerdataset.json"
-ANGULAR_DATA_FILE = BASE_DIR / "frontend" / "public" / "data" / "celltowerdataset.json"
+PROCESSED_DATA_FILE = BASE_DIR / "data" / "processed" / "swiss-cell-tower-sites.json"
+ANGULAR_DATA_FILE = BASE_DIR / "frontend" / "public" / "data" / "swiss-cell-tower-sites.json"
 
 MERGE_DISTANCE_METERS = 25
 

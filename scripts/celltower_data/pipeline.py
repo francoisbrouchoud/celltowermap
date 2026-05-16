@@ -113,11 +113,12 @@ def save_dataset(
     source_metadata: dict[str, Any],
 ) -> None:
     dataset = {
-        "name": "celltowerdataset",
-        "source": source_metadata,
-        "processing": build_processing_metadata(),
-        "celltowers": celltowers,
-    }
+    "name": "swiss-cell-tower-sites",
+    "title": "Swiss cell tower sites",
+    "source": source_metadata,
+    "processing": build_processing_metadata(),
+    "celltowers": celltowers,
+}
 
     output_file.parent.mkdir(parents=True, exist_ok=True)
 
