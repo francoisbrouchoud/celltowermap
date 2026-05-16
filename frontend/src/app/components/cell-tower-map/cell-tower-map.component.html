@@ -12,7 +12,7 @@
           />
         </svg>
 
-        <h2>Filtres</h2>
+        <h2>Filters</h2>
       </div>
 
       <div class="stats-badge">
@@ -34,12 +34,12 @@
     <div class="filters-body" *ngIf="!isCollapsed">
       <div class="filters-actions">
         <button type="button" class="reset-btn" (click)="resetFilters()">
-          Tout réinitialiser
+          Reset All
         </button>
       </div>
 
       <div class="filter-group">
-        <h3>Opérateurs</h3>
+        <h3>Operators</h3>
 
         <div class="chips-container">
           <label
@@ -61,7 +61,7 @@
       </div>
 
       <div class="filter-group">
-        <h3>Technologies</h3>
+        <h3>Technology</h3>
 
         <div class="chips-container">
           <label
@@ -82,7 +82,7 @@
       </div>
 
       <div class="filter-group">
-        <h3>Environnement</h3>
+        <h3>Environment</h3>
 
         <div class="chips-container">
           <label
@@ -103,7 +103,7 @@
       </div>
 
       <div class="filter-group">
-        <h3>Puissance</h3>
+        <h3>Power</h3>
 
         <div class="chips-container">
           <label
@@ -131,15 +131,13 @@
 
   <div class="map-credits-card">
   <span>
-    Données :
+    Data :
     <a [href]="ofcomUrl" target="_blank" rel="noopener noreferrer">OFCOM</a>
   </span>
 
   <span>
-    · MAJ : {{ sourceUpdatedLabel }}
+    · Last Updated : {{ sourceUpdatedLabel }}
   </span>
-
-  <span>· Fond : © OpenStreetMap</span>
 
   <span>
     · Code :

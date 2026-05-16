@@ -67,7 +67,7 @@ export class CellTowerMapComponent implements AfterViewInit, OnDestroy {
   totalTowersCount = 0;
   visibleTowersCount = 0;
 
-  pageTitle = 'Carte des antennes mobiles en Suisse';
+  pageTitle = 'Swiss Cell Tower Map';
 
   ofcomUrl =
     'https://data.geo.admin.ch/browser/index.html#/collections/ch.bakom.standorte-mobilfunkanlagen/items/standorte-mobilfunkanlagen?.asset=asset-standorte-mobilfunkanlagen_2056-json';
@@ -81,7 +81,7 @@ export class CellTowerMapComponent implements AfterViewInit, OnDestroy {
     { label: 'Swisscom', value: 'swisscom', cssClass: 'swisscom' },
     { label: 'Sunrise', value: 'sunrise', cssClass: 'sunrise' },
     { label: 'Salt', value: 'salt', cssClass: 'salt' },
-    { label: 'Autres / CFF (GSM-R)', value: 'other', cssClass: 'other' },
+    { label: 'Others / SBB (GSM-R)', value: 'other', cssClass: 'other' },
   ];
 
   readonly technologyOptions: FilterOption<TechnologyKey>[] = [
@@ -92,15 +92,15 @@ export class CellTowerMapComponent implements AfterViewInit, OnDestroy {
   ];
 
   readonly powerOptions: FilterOption<FilterablePower>[] = [
-    { label: 'Très faible', value: 'very_low' },
-    { label: 'Faible', value: 'low' },
-    { label: 'Moyenne', value: 'medium' },
-    { label: 'Forte', value: 'high' },
+    { label: 'Very low', value: 'very_low' },
+    { label: 'Low', value: 'low' },
+    { label: 'Medium', value: 'medium' },
+    { label: 'High', value: 'high' },
   ];
 
   readonly typeOptions: FilterOption<FilterableType>[] = [
-    { label: 'Extérieur', value: 'outdoor' },
-    { label: 'Intérieur', value: 'indoor' },
+    { label: 'Outdoor', value: 'outdoor' },
+    { label: 'Indoor', value: 'indoor' },
     { label: 'Tunnel', value: 'tunnel' },
   ];
 
@@ -321,7 +321,7 @@ export class CellTowerMapComponent implements AfterViewInit, OnDestroy {
         </h3>
 
         <div style="margin-bottom: 4px;">
-          <strong>Site :</strong> ${this.escapeHtml(tower.stationName || 'Inconnu')}
+          <strong>Site :</strong> ${this.escapeHtml(tower.stationName || 'Unknown')}
         </div>
 
         <div style="margin-bottom: 4px;">
@@ -387,7 +387,7 @@ export class CellTowerMapComponent implements AfterViewInit, OnDestroy {
     if (technology['4g']) labels.push('4G');
     if (technology['5g']) labels.push('5G');
 
-    return labels.length > 0 ? labels.join(', ') : 'Inconnue';
+    return labels.length > 0 ? labels.join(', ') : 'Unknown';
   }
 
   private getMaxTechnology(technology: CellTowerTechnology): string {
@@ -417,15 +417,15 @@ export class CellTowerMapComponent implements AfterViewInit, OnDestroy {
   private getPowerLabel(power: CellTowerPower): string {
     switch (power) {
       case 'very_low':
-        return 'Très faible';
+        return 'Very low';
       case 'low':
-        return 'Faible';
+        return 'Low';
       case 'medium':
-        return 'Moyenne';
+        return 'Medium';
       case 'high':
-        return 'Forte';
+        return 'High';
       default:
-        return 'Inconnue';
+        return 'Unknown';
     }
   }
 
@@ -453,7 +453,7 @@ export class CellTowerMapComponent implements AfterViewInit, OnDestroy {
 
       default:
         return {
-          label: 'Inconnu',
+          label: 'Unknown',
           svg: `<svg style="${svgStyles}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v4"></path><path d="M12 16h.01"></path></svg>`,
         };
     }
