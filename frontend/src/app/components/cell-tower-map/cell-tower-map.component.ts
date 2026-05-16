@@ -9,17 +9,15 @@ import 'leaflet.markercluster';
 import { CellTowerService } from '../../services/cell-tower.service';
 import {
   CellTower,
+  CellTowerDataset,
   CellTowerPower,
   CellTowerTechnology,
   CellTowerType,
 } from '../../models/cell-tower.model';
 
 type TechnologyKey = keyof CellTowerTechnology;
-
 type OperatorFilter = 'swisscom' | 'sunrise' | 'salt' | 'other';
-
 type FilterablePower = Exclude<CellTowerPower, 'unknown'>;
-
 type FilterableType = Exclude<CellTowerType, 'unknown'>;
 
 interface FilterOption<T extends string> {
@@ -69,6 +67,16 @@ export class CellTowerMapComponent implements AfterViewInit, OnDestroy {
   totalTowersCount = 0;
   visibleTowersCount = 0;
 
+  pageTitle = 'Carte des antennes mobiles en Suisse';
+
+  ofcomUrl =
+    'https://data.geo.admin.ch/browser/index.html#/collections/ch.bakom.standorte-mobilfunkanlagen/items/standorte-mobilfunkanlagen?.asset=asset-standorte-mobilfunkanlagen_2056-json';
+
+  githubUrl = 'https://github.com/francoisbrouchoud/celltowermap';
+  licenseLabel = 'MIT';
+
+  sourceUpdatedLabel = '';
+
   readonly operatorOptions: FilterOption<OperatorFilter>[] = [
     { label: 'Swisscom', value: 'swisscom', cssClass: 'swisscom' },
     { label: 'Sunrise', value: 'sunrise', cssClass: 'sunrise' },
@@ -99,9 +107,11 @@ export class CellTowerMapComponent implements AfterViewInit, OnDestroy {
   filters: CellTowerFilters = this.createDefaultFilters();
 
   ngAfterViewInit(): void {
-    this.initMap();
-    this.loadTowers();
-  }
+  this.isCollapsed = window.matchMedia('(max-width: 640px)').matches;
+
+  this.initMap();
+  this.loadTowers();
+}
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
@@ -176,7 +186,10 @@ export class CellTowerMapComponent implements AfterViewInit, OnDestroy {
   }
 
   private initMap(): void {
-    this.map = L.map('map').setView(this.mapCenter, 8);
+    this.map = L.map('map', {
+      zoomControl: false,
+      attributionControl: true,
+    }).setView(this.mapCenter, 8);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
@@ -197,6 +210,7 @@ export class CellTowerMapComponent implements AfterViewInit, OnDestroy {
       next: (dataset) => {
         this.allTowers = dataset.celltowers;
         this.totalTowersCount = this.allTowers.length;
+        this.applyDatasetMetadata(dataset);
         this.applyFilters();
       },
       error: (error) => {
@@ -206,6 +220,20 @@ export class CellTowerMapComponent implements AfterViewInit, OnDestroy {
 
     this.subscriptions.add(subscription);
   }
+
+  private applyDatasetMetadata(dataset: CellTowerDataset): void {
+  const ofcomUrl = dataset.source?.furtherInformationUrl;
+
+  if (ofcomUrl?.trim()) {
+    this.ofcomUrl = ofcomUrl;
+  }
+
+  const updatedAt = dataset.source?.updatedAt ?? dataset.source?.dataDateStart;
+
+  if (updatedAt) {
+    this.sourceUpdatedLabel = this.formatDate(updatedAt);
+  }
+}
 
   private isTowerVisible(tower: CellTower): boolean {
     return (
@@ -429,6 +457,20 @@ export class CellTowerMapComponent implements AfterViewInit, OnDestroy {
           svg: `<svg style="${svgStyles}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v4"></path><path d="M12 16h.01"></path></svg>`,
         };
     }
+  }
+
+  private formatDate(value: string): string {
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+      return value;
+    }
+
+    return new Intl.DateTimeFormat('fr-CH', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    }).format(date);
   }
 
   private escapeHtml(value: string): string {

@@ -9,6 +9,15 @@ export type CellTowerPower = 'very_low' | 'low' | 'medium' | 'high' | 'unknown';
 
 export type CellTowerType = 'indoor' | 'outdoor' | 'tunnel' | 'unknown';
 
+export interface CellTowerSourceMetadata {
+  provider?: string;
+  updatedAt?: string;
+  dataDateStart?: string;
+  rawDataUrl?: string;
+  geocatMetadataUrl?: string;
+  furtherInformationUrl?: string;
+}
+
 export interface CellTower {
   coordinates: [number, number];
   operator: string;
@@ -22,7 +31,7 @@ export interface CellTower {
 export interface CellTowerDataset {
   name: string;
   title?: string;
-  source?: unknown;
+  source?: CellTowerSourceMetadata;
   processing?: unknown;
   celltowers: CellTower[];
 }
