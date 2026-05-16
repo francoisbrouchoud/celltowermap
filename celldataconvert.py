@@ -19,7 +19,7 @@ def LV95toWGS(easting, northing):
 
 
 # Load OFCOM cell dataset JSON
-with open('data/archive/20240223_standorte-mobilfunkanlagen_2056.json', 'r') as f:
+with open('data/standorte-mobilfunkanlagen_2056.json', 'r') as f:
     data = json.load(f)
 
 new_data = {
