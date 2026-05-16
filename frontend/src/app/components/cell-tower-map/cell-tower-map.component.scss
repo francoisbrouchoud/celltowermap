@@ -213,3 +213,75 @@
     bottom: 70px;
   }
 }
+
+::ng-deep {
+  .custom-tower-marker {
+    background: none;
+    border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .tower-icon-wrapper {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+
+      .power-ring {
+        position: absolute;
+        border-radius: 50%;
+        opacity: 0.2;
+        transition: all 0.3s ease;
+      }
+
+      .core-dot {
+        position: relative;
+        border-radius: 50%;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: 700;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        z-index: 2;
+      }
+
+      // Operator Colors
+      &.op-swisscom {
+        .core-dot { background-color: #2563eb; }
+        .power-ring { background-color: #2563eb; }
+      }
+      &.op-sunrise {
+        .core-dot { background-color: #dc2626; }
+        .power-ring { background-color: #dc2626; }
+      }
+      &.op-salt {
+        .core-dot { background-color: #16a34a; }
+        .power-ring { background-color: #16a34a; }
+      }
+
+      // Sizes based on power
+      &.power-very-low {
+        .core-dot { width: 18px; height: 18px; font-size: 10px; }
+        .power-ring { width: 28px; height: 28px; }
+      }
+      &.power-low {
+        .core-dot { width: 22px; height: 22px; font-size: 12px; }
+        .power-ring { width: 40px; height: 40px; opacity: 0.25; }
+      }
+      &.power-medium {
+        .core-dot { width: 26px; height: 26px; font-size: 14px; }
+        .power-ring { width: 56px; height: 56px; opacity: 0.3; }
+      }
+    }
+    
+    &:hover .tower-icon-wrapper .power-ring {
+       transform: scale(1.1);
+       opacity: 0.4;
+    }
+  }
+}

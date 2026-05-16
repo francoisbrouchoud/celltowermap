@@ -18,7 +18,7 @@ export class CellTowerMapComponent implements AfterViewInit, OnDestroy {
   private readonly cellTowerService = inject(CellTowerService);
   
   private allTowers: CellTower[] = [];
-  private operatorClusters: { [key: string]: L.MarkerClusterGroup } = {};
+  private mainClusterGroup!: L.MarkerClusterGroup;
 
   isCollapsed = false;
   totalTowersCount = 0;
@@ -57,11 +57,14 @@ export class CellTowerMapComponent implements AfterViewInit, OnDestroy {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(this.map);
 
-    // Initialisation des groupes de clusters par opérateur
-    this.operators.forEach(op => {
-      this.operatorClusters[op] = L.markerClusterGroup({ chunkedLoading: true });
-      this.map.addLayer(this.operatorClusters[op]);
+    // Initialisation du groupe de clusters global
+    // Un seul groupe permet au plugin de regrouper et "spiderfy" les antennes superposées
+    // même si elles appartiennent à des opérateurs différents.
+    this.mainClusterGroup = L.markerClusterGroup({ 
+      chunkedLoading: true,
+      maxClusterRadius: 50
     });
+    this.map.addLayer(this.mainClusterGroup);
   }
 
   private loadTowers(): void {
@@ -74,14 +77,12 @@ export class CellTowerMapComponent implements AfterViewInit, OnDestroy {
 
   applyFilters(): void {
     // Vider les marqueurs existants
-    this.operators.forEach(op => {
-      this.operatorClusters[op].clearLayers();
-    });
+    if (this.mainClusterGroup) {
+      this.mainClusterGroup.clearLayers();
+    }
 
     let visibleCount = 0;
-    const markersToAdd: { [key: string]: L.Marker[] } = {
-      'Swisscom': [], 'Sunrise': [], 'Salt': []
-    };
+    const markersToAdd: L.Marker[] = [];
 
     this.allTowers.forEach(tower => {
       const opName = this.getOperatorGroup(tower.operator);
@@ -112,13 +113,27 @@ export class CellTowerMapComponent implements AfterViewInit, OnDestroy {
 
       visibleCount++;
 
-      const color = this.getColor(tower.operator);
-      const marker = L.circleMarker([tower.coordinates[0], tower.coordinates[1]], {
-        radius: 6,
-        color: color,
-        fillColor: color,
-        fillOpacity: 0.8,
-        weight: 1
+      const maxTech = this.getMaxTech(tower.technology);
+      const powerProps = this.getMarkerProps(tower.power);
+      const operatorClass = this.getOperatorClass(tower.operator);
+
+      const html = `
+        <div class="tower-icon-wrapper ${powerProps.cssClass} ${operatorClass}">
+          <div class="power-ring"></div>
+          <div class="core-dot"><span>${maxTech}</span></div>
+        </div>
+      `;
+
+      const customIcon = L.divIcon({
+        className: 'custom-tower-marker',
+        html: html,
+        iconSize: [powerProps.size, powerProps.size],
+        iconAnchor: [powerProps.size / 2, powerProps.size / 2],
+        popupAnchor: [0, -powerProps.size / 2]
+      });
+
+      const marker = L.marker([tower.coordinates[0], tower.coordinates[1]], {
+        icon: customIcon
       });
 
       const popupContent = `
@@ -130,28 +145,13 @@ export class CellTowerMapComponent implements AfterViewInit, OnDestroy {
       `;
 
       marker.bindPopup(popupContent);
-      markersToAdd[opName].push(marker as any);
+      markersToAdd.push(marker as any);
     });
 
-    // Ajout en masse aux clusters
-    this.operators.forEach(op => {
-      if (markersToAdd[op].length > 0) {
-        this.operatorClusters[op].addLayers(markersToAdd[op]);
-      }
-    });
-
-    // Gestion de la visibilité globale de la couche opérateur
-    this.operators.forEach(op => {
-      if (this.filters.operators[op]) {
-        if (!this.map.hasLayer(this.operatorClusters[op])) {
-          this.map.addLayer(this.operatorClusters[op]);
-        }
-      } else {
-        if (this.map.hasLayer(this.operatorClusters[op])) {
-          this.map.removeLayer(this.operatorClusters[op]);
-        }
-      }
-    });
+    // Ajout en masse au cluster
+    if (markersToAdd.length > 0) {
+      this.mainClusterGroup.addLayers(markersToAdd);
+    }
 
     this.visibleTowersCount = visibleCount;
   }
@@ -164,12 +164,28 @@ export class CellTowerMapComponent implements AfterViewInit, OnDestroy {
     return null;
   }
 
-  private getColor(operator: string): string {
-    if (!operator) return 'gray';
-    const op = operator.toLowerCase();
-    if (op.includes('swisscom')) return 'blue';
-    if (op.includes('sunrise')) return 'red';
-    if (op.includes('salt')) return 'green';
-    return 'gray';
+  private getMaxTech(technology: string | undefined): string {
+    const tech = (technology || '').toUpperCase();
+    if (tech.includes('5G')) return '5';
+    if (tech.includes('4G')) return '4';
+    if (tech.includes('3G')) return '3';
+    if (tech.includes('2G')) return '2';
+    return '-';
+  }
+
+  private getMarkerProps(power: string | undefined): { size: number, cssClass: string } {
+    const p = (power || '').toLowerCase();
+    if (p.includes('très faible')) return { size: 28, cssClass: 'power-very-low' };
+    if (p.includes('faible')) return { size: 40, cssClass: 'power-low' };
+    if (p.includes('moyenne')) return { size: 56, cssClass: 'power-medium' };
+    return { size: 28, cssClass: 'power-very-low' };
+  }
+
+  private getOperatorClass(operator: string | undefined): string {
+    const op = (operator || '').toLowerCase();
+    if (op.includes('swisscom')) return 'op-swisscom';
+    if (op.includes('sunrise')) return 'op-sunrise';
+    if (op.includes('salt')) return 'op-salt';
+    return 'op-unknown';
   }
 }
