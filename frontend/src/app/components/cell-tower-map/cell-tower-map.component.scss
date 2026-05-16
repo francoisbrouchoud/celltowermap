@@ -1,20 +1,19 @@
 :host {
   display: block;
-  height: 100vh;
-  width: 100vw;
   position: relative;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  width: 100vw;
+  height: 100vh;
   overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
-#map-container {
-  height: 100%;
+#map-container,
+#map {
   width: 100%;
+  height: 100%;
 }
 
 #map {
-  height: 100%;
-  width: 100%;
   z-index: 1;
 }
 
@@ -23,176 +22,220 @@
   top: 1rem;
   right: 1rem;
   z-index: 1000;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  width: calc(100% - 2rem);
-  max-width: 380px;
   display: flex;
   flex-direction: column;
+  width: calc(100% - 2rem);
+  max-width: 380px;
   overflow: hidden;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: #fff;
+  border-radius: 12px;
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
   &.collapsed {
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   }
+}
 
-  .filters-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1rem 1.25rem;
-    cursor: pointer;
-    background: #fff;
-    user-select: none;
-    transition: background-color 0.2s;
-    
-    &:hover {
-      background: #f9fafb;
-    }
+.filters-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  cursor: pointer;
+  user-select: none;
+  background: #fff;
+  transition: background-color 0.2s;
 
-    .title-area {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      color: #374151;
-      
-      h2 {
-        margin: 0;
-        font-size: 1.1rem;
-        font-weight: 600;
-        letter-spacing: -0.01em;
-      }
-    }
+  &:hover {
+    background: #f9fafb;
+  }
+}
 
-    .stats-badge {
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: #0369a1;
-      background: #e0f2fe;
-      padding: 0.25rem 0.75rem;
-      border-radius: 9999px;
-      margin-left: auto;
-      margin-right: 1rem;
-    }
+.title-area {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #374151;
 
-    .toggle-btn {
-      background: none;
-      border: none;
-      color: #9ca3af;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0.25rem;
-      border-radius: 50%;
-      cursor: pointer;
-      transition: background-color 0.2s, color 0.2s;
+  h2 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+}
 
-      &:hover {
-        background: #f3f4f6;
-        color: #4b5563;
-      }
+.stats-badge {
+  margin-right: 1rem;
+  margin-left: auto;
+  padding: 0.25rem 0.75rem;
+  color: #0369a1;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: #e0f2fe;
+  border-radius: 9999px;
+}
 
-      svg {
-        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        &.rotated {
-          transform: rotate(-90deg);
-        }
-      }
-    }
+.toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+  color: #9ca3af;
+  cursor: pointer;
+  background: none;
+  border: none;
+  border-radius: 50%;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+
+  &:hover {
+    color: #4b5563;
+    background: #f3f4f6;
   }
 
-  .filters-body {
-    padding: 0 1.25rem 1.25rem;
-    border-top: 1px solid #f3f4f6;
-    max-height: calc(100vh - 100px);
-    overflow-y: auto;
-    
-    &::-webkit-scrollbar {
-      width: 6px;
-    }
-    &::-webkit-scrollbar-thumb {
-      background-color: #cbd5e1;
-      border-radius: 3px;
-    }
-  }
+  svg {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
-  .filter-group {
-    margin-top: 1.25rem;
-
-    h3 {
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: #6b7280;
-      margin: 0 0 0.75rem 0;
-      font-weight: 600;
-    }
-
-    .chips-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
-
-    .chip {
-      display: inline-flex;
-      align-items: center;
-      padding: 0.4rem 0.85rem;
-      border-radius: 9999px;
-      font-size: 0.85rem;
-      font-weight: 500;
-      color: #4b5563;
-      background: #f3f4f6;
-      border: 1px solid transparent;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      user-select: none;
-
-      &:hover {
-        background: #e5e7eb;
-      }
-
-      &.active {
-        background: #eff6ff;
-        color: #1d4ed8;
-        border-color: #bfdbfe;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-
-        .color-dot {
-          opacity: 1;
-          transform: scale(1.1);
-        }
-      }
-
-      .sr-only {
-        position: absolute;
-        width: 1px;
-        height: 1px;
-        padding: 0;
-        margin: -1px;
-        overflow: hidden;
-        clip: rect(0, 0, 0, 0);
-        border: 0;
-      }
-
-      .color-dot {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        margin-right: 6px;
-        opacity: 0.5;
-        transition: transform 0.2s, opacity 0.2s;
-
-        &.swisscom { background-color: #2563eb; } // Blue
-        &.sunrise { background-color: #dc2626; }  // Red
-        &.salt { background-color: #16a34a; }     // Green
-      }
+    &.rotated {
+      transform: rotate(-90deg);
     }
   }
 }
 
-// Mobile responsive
+.filters-body {
+  max-height: calc(100vh - 100px);
+  padding: 0 1.25rem 1.25rem;
+  overflow-y: auto;
+  border-top: 1px solid #f3f4f6;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 3px;
+  }
+}
+
+.filters-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.reset-btn {
+  padding: 0.35rem 0.8rem;
+  color: #374151;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 9999px;
+  transition:
+    background-color 0.2s,
+    border-color 0.2s;
+
+  &:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
+  }
+}
+
+.filter-group {
+  margin-top: 1.25rem;
+
+  h3 {
+    margin: 0 0 0.75rem;
+    color: #6b7280;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+}
+
+.chips-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 0.85rem;
+  color: #4b5563;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  user-select: none;
+  background: #f3f4f6;
+  border: 1px solid transparent;
+  border-radius: 9999px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #e5e7eb;
+  }
+
+  &.active {
+    color: #1d4ed8;
+    background: #eff6ff;
+    border-color: #bfdbfe;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+
+    .color-dot {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+  }
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  border: 0;
+  clip: rect(0, 0, 0, 0);
+}
+
+.color-dot {
+  width: 10px;
+  height: 10px;
+  margin-right: 6px;
+  border-radius: 50%;
+  opacity: 0.5;
+  transition:
+    opacity 0.2s,
+    transform 0.2s;
+
+  &.swisscom {
+    background-color: #2563eb;
+  }
+
+  &.sunrise {
+    background-color: #dc2626;
+  }
+
+  &.salt {
+    background-color: #16a34a;
+  }
+
+  &.other {
+    background-color: #6b7280;
+  }
+}
+
 @media (max-width: 640px) {
   .filters-panel {
     top: auto;
@@ -200,15 +243,14 @@
     left: 0;
     width: 100%;
     max-width: none;
-    border-radius: 16px 16px 0 0;
     margin: 0;
-    
-    .filters-body {
-      max-height: 50vh;
-    }
+    border-radius: 16px 16px 0 0;
   }
 
-  // Optional: Move leaflet controls up slightly on mobile
+  .filters-body {
+    max-height: 50vh;
+  }
+
   ::ng-deep .leaflet-control-container .leaflet-bottom {
     bottom: 70px;
   }
@@ -216,72 +258,142 @@
 
 ::ng-deep {
   .custom-tower-marker {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background: none;
     border: none;
-    display: flex;
-    justify-content: center;
-    align-items: center;
 
-    .tower-icon-wrapper {
-      position: relative;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 100%;
-      height: 100%;
-
-      .power-ring {
-        position: absolute;
-        border-radius: 50%;
-        opacity: 0.2;
-        transition: all 0.3s ease;
-      }
-
-      .core-dot {
-        position: relative;
-        border-radius: 50%;
-        color: white;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-weight: 700;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        z-index: 2;
-      }
-
-      // Operator Colors
-      &.op-swisscom {
-        .core-dot { background-color: #2563eb; }
-        .power-ring { background-color: #2563eb; }
-      }
-      &.op-sunrise {
-        .core-dot { background-color: #dc2626; }
-        .power-ring { background-color: #dc2626; }
-      }
-      &.op-salt {
-        .core-dot { background-color: #16a34a; }
-        .power-ring { background-color: #16a34a; }
-      }
-
-      // Sizes based on power
-      &.power-very-low {
-        .core-dot { width: 18px; height: 18px; font-size: 10px; }
-        .power-ring { width: 28px; height: 28px; }
-      }
-      &.power-low {
-        .core-dot { width: 22px; height: 22px; font-size: 12px; }
-        .power-ring { width: 40px; height: 40px; opacity: 0.25; }
-      }
-      &.power-medium {
-        .core-dot { width: 26px; height: 26px; font-size: 14px; }
-        .power-ring { width: 56px; height: 56px; opacity: 0.3; }
-      }
-    }
-    
     &:hover .tower-icon-wrapper .power-ring {
-       transform: scale(1.1);
-       opacity: 0.4;
+      opacity: 0.4;
+      transform: scale(1.1);
+    }
+  }
+
+  .tower-icon-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+  }
+
+  .power-ring {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.2;
+    transition: all 0.3s ease;
+  }
+
+  .core-dot {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    font-weight: 700;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  .op-swisscom {
+    .core-dot,
+    .power-ring {
+      background-color: #2563eb;
+    }
+  }
+
+  .op-sunrise {
+    .core-dot,
+    .power-ring {
+      background-color: #dc2626;
+    }
+  }
+
+  .op-salt {
+    .core-dot,
+    .power-ring {
+      background-color: #16a34a;
+    }
+  }
+
+  .op-other {
+    .core-dot,
+    .power-ring {
+      background-color: #6b7280;
+    }
+  }
+
+  .power-very-low {
+    .core-dot {
+      width: 18px;
+      height: 18px;
+      font-size: 10px;
+    }
+
+    .power-ring {
+      width: 28px;
+      height: 28px;
+    }
+  }
+
+  .power-low {
+    .core-dot {
+      width: 22px;
+      height: 22px;
+      font-size: 12px;
+    }
+
+    .power-ring {
+      width: 40px;
+      height: 40px;
+      opacity: 0.25;
+    }
+  }
+
+  .power-medium {
+    .core-dot {
+      width: 26px;
+      height: 26px;
+      font-size: 14px;
+    }
+
+    .power-ring {
+      width: 56px;
+      height: 56px;
+      opacity: 0.3;
+    }
+  }
+
+  .power-high {
+  .core-dot {
+    width: 30px;
+    height: 30px;
+    font-size: 15px;
+  }
+
+  .power-ring {
+    width: 64px;
+    height: 64px;
+    opacity: 0.25;
+  }
+  
+  }
+
+  .power-unknown {
+    .core-dot {
+      width: 18px;
+      height: 18px;
+      font-size: 10px;
+    }
+
+    .power-ring {
+      width: 28px;
+      height: 28px;
+      opacity: 0.15;
     }
   }
 }
