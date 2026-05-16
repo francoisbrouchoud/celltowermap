@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 
 import * as L from 'leaflet';
-import 'leaflet.markercluster';
 
 import { CellTowerService } from '../../services/cell-tower.service';
 import {
@@ -108,10 +107,19 @@ export class CellTowerMapComponent implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
   this.isCollapsed = window.matchMedia('(max-width: 640px)').matches;
+  void this.bootstrapMap();
+  }
 
-  this.initMap();
-  this.loadTowers();
-}
+  private async bootstrapMap(): Promise<void> {
+    (window as any).L = L;
+
+    await import('leaflet.markercluster');
+
+    console.log('markerClusterGroup:', typeof (L as any).markerClusterGroup);
+
+    this.initMap();
+    this.loadTowers();
+  }
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
@@ -206,20 +214,25 @@ export class CellTowerMapComponent implements AfterViewInit, OnDestroy {
   }
 
   private loadTowers(): void {
-    const subscription = this.cellTowerService.getCellTowers().subscribe({
-      next: (dataset) => {
-        this.allTowers = dataset.celltowers;
-        this.totalTowersCount = this.allTowers.length;
-        this.applyDatasetMetadata(dataset);
-        this.applyFilters();
-      },
-      error: (error) => {
-        console.error('Error loading cell tower dataset:', error);
-      },
-    });
+  fetch('data/swiss-cell-tower-sites.json')
+    .then(res => {
+      console.log('status', res.status);
+      return res.json();
+    })
+    .then((dataset: CellTowerDataset) => {
+      console.log('data loaded', dataset);
+      console.log('celltowers', dataset.celltowers);
+      console.log('count', dataset.celltowers?.length);
 
-    this.subscriptions.add(subscription);
-  }
+      this.allTowers = dataset.celltowers;
+      this.totalTowersCount = this.allTowers.length;
+      this.applyDatasetMetadata(dataset);
+      this.applyFilters();
+    })
+    .catch(err => {
+      console.error('data loading error:', err);
+    });
+}
 
   private applyDatasetMetadata(dataset: CellTowerDataset): void {
   const ofcomUrl = dataset.source?.furtherInformationUrl;
