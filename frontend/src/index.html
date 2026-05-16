@@ -1,13 +1,68 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>Frontend</title>
-  <base href="/">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
-</head>
-<body>
-  <app-root></app-root>
-</body>
+  <head>
+    <meta charset="utf-8" />
+
+    <title>Swiss Mobile Antenna Map</title>
+
+    <base href="/" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <meta
+      name="description"
+      content="Interactive map of mobile antenna sites in Switzerland. Explore 2G, 3G, 4G and 5G antenna locations using official OFCOM data, with filters by operator, technology, environment and power level."
+    />
+
+    <meta
+      name="keywords"
+      content="Swiss mobile antenna map, mobile antennas Switzerland, 5G antennas Switzerland, 4G antennas Switzerland, OFCOM, BAKOM, Swisscom, Sunrise, Salt, GSM-R"
+    />
+
+    <meta name="author" content="François Brouchoud" />
+    <meta name="robots" content="index, follow" />
+
+    <link rel="canonical" href="https://celltowermap.ch/" />
+
+    <meta property="og:title" content="Swiss Mobile Antenna Map" />
+    <meta
+      property="og:description"
+      content="Interactive map of mobile antenna sites in Switzerland based on official OFCOM data."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://celltowermap.ch/" />
+    <meta property="og:locale" content="en_US" />
+
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Swiss Mobile Antenna Map" />
+    <meta
+      name="twitter:description"
+      content="Explore mobile antenna sites in Switzerland with filters for 2G, 3G, 4G, 5G, operators, environment and power level."
+    />
+
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="alternate icon" type="image/x-icon" href="favicon.ico" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Swiss Mobile Antenna Map",
+        "url": "https://celltowermap.ch/",
+        "applicationCategory": "MapApplication",
+        "operatingSystem": "Web",
+        "description": "Interactive map of mobile antenna sites in Switzerland based on official OFCOM data.",
+        "author": {
+          "@type": "Person",
+          "name": "François Brouchoud",
+          "url": "https://github.com/francoisbrouchoud"
+        },
+        "license": "https://opensource.org/licenses/MIT"
+      }
+    </script>
+  </head>
+
+  <body>
+    <app-root></app-root>
+  </body>
 </html>
