@@ -45,7 +45,12 @@ jobs:
 
       - name: Build Angular app
         working-directory: frontend
-        run: npm run build -- --configuration production --base-href /celltowermap/
+        run: npm run build -- --configuration production --base-href /
+
+      - name: Verify build output
+        run: |
+          find frontend/dist -name "index.html"
+          find frontend/dist -name "swiss-cell-tower-sites.json"
 
       - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@v3
@@ -64,4 +69,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
