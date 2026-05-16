@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, inject } from '@angular/core';
+import { Component, AfterViewInit, OnDestroy, inject } from '@angular/core';
 import * as L from 'leaflet';
 import 'leaflet.markercluster';
 import { CellTowerService } from '../../services/cell-tower.service';
@@ -9,13 +9,19 @@ import { CellTowerService } from '../../services/cell-tower.service';
   templateUrl: './cell-tower-map.component.html',
   styleUrls: ['./cell-tower-map.component.scss']
 })
-export class CellTowerMapComponent implements AfterViewInit {
+export class CellTowerMapComponent implements AfterViewInit, OnDestroy {
   private map!: L.Map;
   private readonly cellTowerService = inject(CellTowerService);
 
   ngAfterViewInit(): void {
     this.initMap();
     this.loadTowers();
+  }
+
+  ngOnDestroy(): void {
+    if (this.map) {
+      this.map.remove();
+    }
   }
 
   private initMap(): void {
@@ -29,9 +35,7 @@ export class CellTowerMapComponent implements AfterViewInit {
 
   private loadTowers(): void {
     this.cellTowerService.getCellTowers().subscribe(dataset => {
-      const markers = L.markerClusterGroup({
-        chunkedLoading: true
-      });
+      const operatorClusters: { [key: string]: L.MarkerClusterGroup } = {};
 
       dataset.celltowers.forEach(tower => {
         const color = this.getColor(tower.operator);
@@ -53,10 +57,32 @@ export class CellTowerMapComponent implements AfterViewInit {
         `;
 
         marker.bindPopup(popupContent);
-        markers.addLayer(marker);
+
+        // Répartition dans les groupes selon l'opérateur
+        const op = (tower.operator || '').toLowerCase();
+        let groupName = 'Autres';
+        if (op.includes('swisscom')) groupName = 'Swisscom';
+        else if (op.includes('sunrise')) groupName = 'Sunrise';
+        else if (op.includes('salt')) groupName = 'Salt';
+
+        if (!operatorClusters[groupName]) {
+          operatorClusters[groupName] = L.markerClusterGroup({ chunkedLoading: true });
+        }
+        operatorClusters[groupName].addLayer(marker);
       });
 
-      this.map.addLayer(markers);
+      // Ajout des clusters à la carte et au panneau de contrôle
+      const overlays: L.Control.LayersObject = {};
+      const order = ['Swisscom', 'Sunrise', 'Salt', 'Autres'];
+      
+      order.forEach(groupName => {
+        if (operatorClusters[groupName]) {
+          this.map.addLayer(operatorClusters[groupName]);
+          overlays[groupName] = operatorClusters[groupName];
+        }
+      });
+
+      L.control.layers(undefined, overlays, { collapsed: false }).addTo(this.map);
     });
   }
 
