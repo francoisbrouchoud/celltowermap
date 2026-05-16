@@ -5,6 +5,9 @@ from typing import Any
 from .config import MERGE_DISTANCE_METERS
 
 
+TechnologyFlags = dict[str, bool]
+
+
 def lv95_to_wgs(easting: float, northing: float) -> tuple[float, float]:
     if not isinstance(easting, (int, float)) or not isinstance(northing, (int, float)):
         raise ValueError("Easting and northing must be numeric.")
@@ -42,16 +45,29 @@ def normalize_operator(station: str) -> str:
 
 
 def normalize_power(power_input: str) -> str:
+    """
+    Source: power_en.
+
+    Output values:
+    - very_low
+    - low
+    - medium
+    - high
+    - unknown
+    """
     power_input = (power_input or "").lower()
 
     if "very low" in power_input:
-        return "très faible"
+        return "very_low"
+
     if "low" in power_input:
-        return "faible"
+        return "low"
+
     if "medium" in power_input:
-        return "moyenne"
+        return "medium"
+
     if "high" in power_input:
-        return "forte"
+        return "high"
 
     return "unknown"
 
@@ -59,10 +75,10 @@ def normalize_power(power_input: str) -> str:
 def power_rank(power: str) -> int:
     ranks = {
         "unknown": 0,
-        "très faible": 1,
-        "faible": 2,
-        "moyenne": 3,
-        "forte": 4,
+        "very_low": 1,
+        "low": 2,
+        "medium": 3,
+        "high": 4,
     }
 
     return ranks.get(power, 0)
@@ -70,13 +86,16 @@ def power_rank(power: str) -> int:
 
 def normalize_type(type_input: str, power: str) -> str:
     """
-    Normalize antenna type.
+    Source: typ_en.
 
-    If OFCOM type is empty:
-    - très faible => indoor
-    - faible / moyenne / forte => outdoor
+    If typ_en is empty:
+    - very_low => indoor
+    - low / medium / high => outdoor
     """
     type_input = (type_input or "").lower().strip()
+
+    if "tunnel" in type_input:
+        return "tunnel"
 
     if "indoor" in type_input:
         return "indoor"
@@ -84,44 +103,50 @@ def normalize_type(type_input: str, power: str) -> str:
     if "outdoor" in type_input:
         return "outdoor"
 
-    if "tunnel" in type_input:
-        return "tunnel"
-
-    if power == "très faible":
+    if power == "very_low":
         return "indoor"
 
-    if power in ["faible", "moyenne", "forte"]:
+    if power in ["low", "medium", "high"]:
         return "outdoor"
 
     return "unknown"
 
 
-def extract_technologies(technology_input: str) -> list[str]:
-    technology_input = technology_input or ""
-
-    technologies = []
-
-    for technology in ["2G", "3G", "4G", "5G"]:
-        if technology in technology_input:
-            technologies.append(technology)
-
-    return technologies
+def empty_technology_flags() -> TechnologyFlags:
+    return {
+        "2g": False,
+        "3g": False,
+        "4g": False,
+        "5g": False,
+    }
 
 
-def merge_technologies(technology_lists: list[list[str]]) -> str:
-    order = ["2G", "3G", "4G", "5G"]
-    merged = set()
+def extract_technology_flags(technology_input: str) -> TechnologyFlags:
+    """
+    Source: techno_en.
 
-    for technologies in technology_lists:
-        merged.update(technologies)
+    Example input:
+    - Technology 3G,4G,5G
+    - Technology 4G
+    """
+    technology_input = (technology_input or "").upper()
 
-    sorted_technologies = [technology for technology in order if technology in merged]
+    return {
+        "2g": "2G" in technology_input,
+        "3g": "3G" in technology_input,
+        "4g": "4G" in technology_input,
+        "5g": "5G" in technology_input,
+    }
 
-    if not sorted_technologies:
-        return "Technologie inconnue"
 
-    return "Technologie " + ",".join(sorted_technologies)
+def merge_technology_flags(technology_flags_list: list[TechnologyFlags]) -> TechnologyFlags:
+    merged = empty_technology_flags()
 
+    for technology_flags in technology_flags_list:
+        for key in merged:
+            merged[key] = merged[key] or technology_flags.get(key, False)
+
+    return merged
 
 def distance_lv95(point_a: list[float], point_b: list[float]) -> float:
     easting_a, northing_a = point_a
@@ -152,7 +177,7 @@ def merge_nearby_antennas(antennas: list[dict[str, Any]]) -> list[dict[str, Any]
     """
     Merge antennas only if:
     - same operator
-    - same type: indoor, outdoor, tunnel or unknown
+    - same type
     - distance <= 25 meters in LV95 coordinates
     """
     union_find = UnionFind(len(antennas))
@@ -197,18 +222,16 @@ def build_merged_antenna(group: list[dict[str, Any]]) -> dict[str, Any]:
 
     latitude, longitude = lv95_to_wgs(*representative["lv95"])
 
-    original_stations = sorted(
-        set(antenna["station"] for antenna in group if antenna["station"])
+    merged_technology = merge_technology_flags(
+        [antenna["technology"] for antenna in group]
     )
 
     return {
         "coordinates": [latitude, longitude],
         "operator": representative["operator"],
-        "technology": merge_technologies(
-            [antenna["technologies"] for antenna in group]
-        ),
+        "stationName": group[0]["station"],
+        "technology": merged_technology,
         "power": representative["power"],
         "type": representative["type"],
         "mergedCount": len(group),
-        "originalStations": original_stations,
     }

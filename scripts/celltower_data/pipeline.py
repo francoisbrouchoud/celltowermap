@@ -14,7 +14,7 @@ from .config import (
 )
 from .download import download_raw_dataset, get_source_metadata
 from .transform import (
-    extract_technologies,
+    extract_technology_flags,
     merge_nearby_antennas,
     normalize_operator,
     normalize_power,
@@ -22,28 +22,47 @@ from .transform import (
 )
 
 
-def load_antennas(input_file: Path) -> list[dict[str, Any]]:
+def load_json_file(input_file: Path) -> dict[str, Any]:
     with input_file.open("r", encoding="utf-8") as file:
-        data = json.load(file)
+        return json.load(file)
 
-    antennas = []
 
-    for feature in data["features"]:
-        properties = feature["properties"]
-        easting, northing = feature["geometry"]["coordinates"]
+def load_antennas(input_file: Path) -> list[dict[str, Any]]:
+    """
+    Load raw OFCOM antennas from the LV95 GeoJSON file.
+
+    Source fields used:
+    - station
+    - power_en
+    - techno_en
+    - typ_en
+    """
+    data = load_json_file(input_file)
+    antennas: list[dict[str, Any]] = []
+
+    for feature in data.get("features", []):
+        properties = feature.get("properties", {})
+        geometry = feature.get("geometry", {})
+
+        coordinates = geometry.get("coordinates")
+        if not coordinates or len(coordinates) < 2:
+            continue
+
+        easting, northing = coordinates
 
         station = properties.get("station", "")
         operator = normalize_operator(station)
 
         power = normalize_power(properties.get("power_en", ""))
 
+        # OFCOM field is "typ_en", not "type_en"
         antenna_type = normalize_type(
-            properties.get("typ_en") or properties.get("typ_fr", ""),
+            properties.get("typ_en", ""),
             power,
         )
 
-        technologies = extract_technologies(
-            properties.get("techno_fr") or properties.get("techno_en", "")
+        technology = extract_technology_flags(
+            properties.get("techno_en", "")
         )
 
         antennas.append(
@@ -51,13 +70,41 @@ def load_antennas(input_file: Path) -> list[dict[str, Any]]:
                 "lv95": [easting, northing],
                 "station": station,
                 "operator": operator,
-                "technologies": technologies,
+                "technology": technology,
                 "power": power,
                 "type": antenna_type,
             }
         )
 
     return antennas
+
+
+def build_processing_metadata() -> dict[str, Any]:
+    return {
+        "coordinateSystemInput": "EPSG:2056",
+        "coordinateSystemOutput": "WGS84",
+        "mergeDistanceMeters": MERGE_DISTANCE_METERS,
+        "mergeRule": (
+            "Antennas are merged only when they belong to the same operator, "
+            "have the same type and are within the configured distance."
+        ),
+        "powerRule": (
+            "Power is normalized from power_en into one of: "
+            "very_low, low, medium, high or unknown. "
+            "When antennas are merged, the highest power class is kept."
+        ),
+        "technologyRule": (
+            "Technology is extracted from techno_en and stored as boolean flags "
+            "for 2g, 3g, 4g and 5g. "
+            "When antennas are merged, technology flags are combined."
+        ),
+        "typeRule": (
+            "Type is extracted from typ_en. "
+            "If typ_en is empty, very_low power is considered indoor; "
+            "low, medium and high power are considered outdoor."
+        ),
+        "processedAt": datetime.now(timezone.utc).isoformat(),
+    }
 
 
 def save_dataset(
@@ -68,22 +115,7 @@ def save_dataset(
     dataset = {
         "name": "celltowerdataset",
         "source": source_metadata,
-        "processing": {
-            "coordinateSystemInput": "EPSG:2056",
-            "coordinateSystemOutput": "WGS84",
-            "mergeDistanceMeters": MERGE_DISTANCE_METERS,
-            "mergeRule": (
-                "Antennas are merged only when they belong to the same operator, "
-                "have the same type and are within 25 meters."
-            ),
-            "powerRule": "When antennas are merged, the highest power class is kept.",
-            "technologyRule": "When antennas are merged, technologies are combined.",
-            "typeFallbackRule": (
-                "If OFCOM type is empty, very low power is considered indoor; "
-                "low, medium and high power are considered outdoor."
-            ),
-            "processedAt": datetime.now(timezone.utc).isoformat(),
-        },
+        "processing": build_processing_metadata(),
         "celltowers": celltowers,
     }
 
@@ -99,21 +131,28 @@ def copy_dataset_to_angular(source_file: Path, angular_output_file: Path) -> Non
 
 
 def run_pipeline() -> None:
-    source_metadata = get_source_metadata()
-
     if DOWNLOAD_RAW_DATA:
         download_raw_dataset(RAW_DATA_FILE)
 
     if not RAW_DATA_FILE.exists():
-        raise FileNotFoundError(f"Input file not found: {RAW_DATA_FILE}")
+        raise FileNotFoundError(f"Raw data file not found: {RAW_DATA_FILE}")
+
+    source_metadata = get_source_metadata()
 
     antennas = load_antennas(RAW_DATA_FILE)
     celltowers = merge_nearby_antennas(antennas)
 
-    save_dataset(PROCESSED_DATA_FILE, celltowers, source_metadata)
+    save_dataset(
+        output_file=PROCESSED_DATA_FILE,
+        celltowers=celltowers,
+        source_metadata=source_metadata,
+    )
 
     if COPY_TO_ANGULAR:
-        copy_dataset_to_angular(PROCESSED_DATA_FILE, ANGULAR_DATA_FILE)
+        copy_dataset_to_angular(
+            source_file=PROCESSED_DATA_FILE,
+            angular_output_file=ANGULAR_DATA_FILE,
+        )
 
     print(f"Source updated at: {source_metadata.get('updatedAt')}")
     print(f"Source data date: {source_metadata.get('dataDateStart')}")
