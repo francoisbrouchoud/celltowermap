@@ -145,7 +145,4 @@ The antenna data comes from OFCOM / BAKOM and is subject to its own terms of use
 ## Author
 
 Created by François Brouchoud.
-Launched in March 2024
 
-```
-```
