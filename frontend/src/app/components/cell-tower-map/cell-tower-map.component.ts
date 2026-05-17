@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnDestroy, inject } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
@@ -51,6 +51,7 @@ interface TypeDisplayInfo {
 })
 export class CellTowerMapComponent implements AfterViewInit, OnDestroy {
   private readonly cellTowerService = inject(CellTowerService);
+  private readonly changeDetectorRef = inject(ChangeDetectorRef);
   private readonly subscriptions = new Subscription();
 
   private readonly mapCenter: L.LatLngExpression = [46.8182, 8.2275];
@@ -59,6 +60,7 @@ export class CellTowerMapComponent implements AfterViewInit, OnDestroy {
   private map!: L.Map;
   private markerClusterGroup!: L.MarkerClusterGroup;
   private highPowerRadiusLayer!: L.LayerGroup;
+  
 
   private allTowers: CellTower[] = [];
 
@@ -228,6 +230,7 @@ export class CellTowerMapComponent implements AfterViewInit, OnDestroy {
       this.totalTowersCount = this.allTowers.length;
       this.applyDatasetMetadata(dataset);
       this.applyFilters();
+      this.changeDetectorRef.detectChanges();
     })
     .catch(err => {
       console.error('data loading error:', err);
