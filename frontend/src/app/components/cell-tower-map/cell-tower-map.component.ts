@@ -71,7 +71,7 @@ export class CellTowerMapComponent implements AfterViewInit, OnDestroy {
   pageTitle = 'Swiss Cell Tower Map';
 
   ofcomUrl =
-    'https://data.geo.admin.ch/browser/index.html#/collections/ch.bakom.standorte-mobilfunkanlagen/items/standorte-mobilfunkanlagen?.asset=asset-standorte-mobilfunkanlagen_2056-json';
+    'https://data.geo.admin.ch/browser/index.html#/collections/ch.bakom.standorte-mobilfunkanlagen/items/standorte-mobilfunkanlagen?.language=en&.asset=asset-standorte-mobilfunkanlagen_2056-json';
 
   githubUrl = 'https://github.com/francoisbrouchoud/celltowermap';
   licenseLabel = 'MIT';
@@ -238,11 +238,6 @@ export class CellTowerMapComponent implements AfterViewInit, OnDestroy {
 }
 
   private applyDatasetMetadata(dataset: CellTowerDataset): void {
-  const ofcomUrl = dataset.source?.furtherInformationUrl;
-
-  if (ofcomUrl?.trim()) {
-    this.ofcomUrl = ofcomUrl;
-  }
 
   const updatedAt = dataset.source?.updatedAt ?? dataset.source?.dataDateStart;
 
@@ -341,13 +336,12 @@ export class CellTowerMapComponent implements AfterViewInit, OnDestroy {
         </div>
 
         <div style="margin-bottom: 4px;">
-          <strong>Technologie :</strong> ${this.getTechnologyLabel(tower.technology)}
+          <strong>Technologies :</strong> ${this.getTechnologyLabel(tower.technology)}
         </div>
 
         <div style="margin-bottom: 4px;">
-          <strong>Puissance :</strong> ${this.getPowerLabel(tower.power)}
+          <strong>Power :</strong> ${this.getPowerLabel(tower.power)}
         </div>
-
         <div style="margin-bottom: 4px; display: flex; align-items: center;">
           <strong>Type :</strong>
           <span style="display: flex; align-items: center; margin-left: 4px;">
