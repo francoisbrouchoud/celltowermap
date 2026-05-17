@@ -1,19 +1,33 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="14" fill="#0f172a"></rect>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Swiss Cell Tower Map icon">
+  <defs>
+    <linearGradient id="bg" x1="10" y1="8" x2="54" y2="58" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0f172a"></stop>
+      <stop offset="1" stop-color="#1e3a8a"></stop>
+    </linearGradient>
 
-  <path d="M32 42V26" stroke="#ffffff" stroke-width="4" stroke-linecap="round"></path>
+    <linearGradient id="signal" x1="18" y1="8" x2="46" y2="34" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#7dd3fc"></stop>
+      <stop offset="1" stop-color="#2563eb"></stop>
+    </linearGradient>
+  </defs>
 
-  <path d="M24 48h16" stroke="#ffffff" stroke-width="4" stroke-linecap="round"></path>
+  <rect width="64" height="64" rx="16" fill="url(#bg)"></rect>
 
-  <circle cx="32" cy="22" r="4" fill="#38bdf8"></circle>
+  <circle cx="32" cy="23" r="4.5" fill="#38bdf8"></circle>
 
-  <path d="M22 24c-3-4-3-9 0-13" stroke="#38bdf8" stroke-width="3" stroke-linecap="round" fill="none"></path>
+  <path d="M32 28v17" stroke="#ffffff" stroke-width="4" stroke-linecap="round"></path>
 
-  <path d="M42 24c3-4 3-9 0-13" stroke="#38bdf8" stroke-width="3" stroke-linecap="round" fill="none"></path>
+  <path d="M24 51h16" stroke="#ffffff" stroke-width="4" stroke-linecap="round"></path>
 
-  <path d="M15 28c-6-8-6-18 0-26" stroke="#2563eb" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.9"></path>
+  <path d="M27 45l5-14 5 14" stroke="#ffffff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
 
-  <path d="M49 28c6-8 6-18 0-26" stroke="#2563eb" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.9"></path>
+  <path d="M23.5 26.5c-3.6-4.6-3.6-10.4 0-15" stroke="url(#signal)" stroke-width="3.2" stroke-linecap="round" fill="none"></path>
 
-  <path d="M25 42l7-14 7 14" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+  <path d="M40.5 26.5c3.6-4.6 3.6-10.4 0-15" stroke="url(#signal)" stroke-width="3.2" stroke-linecap="round" fill="none"></path>
+
+  <path d="M16.5 30c-6.4-8.2-6.4-18.8 0-27" stroke="#60a5fa" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.9"></path>
+
+  <path d="M47.5 30c6.4-8.2 6.4-18.8 0-27" stroke="#60a5fa" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.9"></path>
+
+  <circle cx="32" cy="23" r="9" fill="#38bdf8" opacity="0.13"></circle>
 </svg>

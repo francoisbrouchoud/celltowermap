@@ -1,6 +1,11 @@
 <div class="map-shell">
   <div class="map-title-card">
-    <h1>{{ pageTitle }}</h1>
+    <img src="favicon.svg" alt="" class="map-title-icon" />
+    <h1>
+      {{ pageTitle }}
+      <span class="version-badge">v2</span>
+  </h1>
+
   </div>
 
   <div class="filters-panel" [class.collapsed]="isCollapsed">
@@ -131,18 +136,17 @@
 
   <div class="map-credits-card">
   <span>
-    Data :
+    Data from
     <a [href]="ofcomUrl" target="_blank" rel="noopener noreferrer">OFCOM</a>
   </span>
 
-  <span>
-    · Updated : {{ sourceUpdatedLabel }}
+  <span>, updated {{ sourceUpdatedLabel }}
   </span>
 
   <span>
-    · Code :
+    · Code on
     <a [href]="githubUrl" target="_blank" rel="noopener noreferrer">GitHub</a>
-    / Lic. {{ licenseLabel }}
+  under {{ licenseLabel }}
   </span>
 </div>
 </div>

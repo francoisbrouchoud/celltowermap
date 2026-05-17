@@ -74,7 +74,7 @@ export class CellTowerMapComponent implements AfterViewInit, OnDestroy {
     'https://data.geo.admin.ch/browser/index.html#/collections/ch.bakom.standorte-mobilfunkanlagen/items/standorte-mobilfunkanlagen?.language=en&.asset=asset-standorte-mobilfunkanlagen_2056-json';
 
   githubUrl = 'https://github.com/francoisbrouchoud/celltowermap';
-  licenseLabel = 'MIT';
+  licenseLabel = 'MIT Licence';
 
   sourceUpdatedLabel = '';
 
